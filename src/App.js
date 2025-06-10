@@ -21,10 +21,6 @@ import AdminRouters from './Routers/AdminRouters';
 function App() {
   return (
     <div>
-      <div className="">
-      <Navigation/>
-      </div>
-      <div className="pt-20">
       <Routes>
         <Route path='/*' element={<CustomerRouters/>}></Route>
         <Route path='/admin/*' element={<AdminRouters/>}></Route>
@@ -32,7 +28,7 @@ function App() {
       {/* <Product/> */}
       </div>
     
-    </div>
+  
     
 
    

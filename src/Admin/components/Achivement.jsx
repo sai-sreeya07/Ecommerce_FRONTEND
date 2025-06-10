@@ -1,39 +1,55 @@
-import { Button, Card, CardContent, Typography, styled } from '@mui/material'
-import React from 'react'
+import { Box, Card, CardContent, Typography } from '@mui/material';
+import React from 'react';
 
-const TrignleImg=styled("img")({
-    right:0,
-    bottom:0,
-    height:170,
-    position:'absolute'
-})
-
-const TrophyImg=styled("img")({
-    right:36,
-    bottom:20,
-    height:98,
-    position:'absolute'
-})
+const StatCard = ({ title, value }) => (
+  <Card
+    sx={{
+      flex: 1,
+      minWidth: 200,
+      bgcolor: '#2C3E50',
+      color: 'white',
+      borderRadius: 2,
+      p: 2,
+    }}
+  >
+    <CardContent>
+      <Typography variant="h6" gutterBottom>
+        {title}
+      </Typography>
+      <Typography variant="h4">{value}</Typography>
+    </CardContent>
+  </Card>
+);
 
 const Achivement = () => {
   return (
-    <div className=''>
-    <Card className='' sx={{position:"relative", bgcolor:"#333945", color:"white"}}>
+    <Box sx={{ p: 2 }}>
+      {/* Welcome Card */}
+     
+<Card sx={{ bgcolor: '#333945', color: 'white', mb: 4, p: 2 }}>
+
         <CardContent>
-<Typography variant='h6' sx={{letterSpacing:".25px"}}>
-    E-Bharat
-</Typography>
-<Typography variant='body2'>Congratulations 🤘</Typography>
-<Typography variant='h5' sx={{my:2.1}}> 420.80k</Typography>
-
-<Button size='small' variant='contained'>View sales</Button>
-
-<TrignleImg src=''></TrignleImg>
-<TrophyImg src='https://static.vecteezy.com/system/resources/previews/023/234/869/original/transparent-golden-cup-trophy-for-victory-win-at-contest-as-an-award-and-prize-for-achievement-png.png'/>
+          <Typography variant="h6" sx={{ letterSpacing: '.25px' }}>
+            Welcome to E-Kart Admin
+          </Typography>
         </CardContent>
-    </Card>
-    </div>
-  )
-}
+      </Card>
 
-export default Achivement
+      {/* Stat Boxes with spacing */}
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 3,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <StatCard title="Orders" value="1,200" />
+        <StatCard title="Products" value="320" />
+        <StatCard title="Customers" value="980" />
+      </Box>
+    </Box>
+  );
+};
+
+export default Achivement;

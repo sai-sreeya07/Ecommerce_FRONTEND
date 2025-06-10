@@ -23,12 +23,12 @@ const ProductsTable = () => {
       category:"",
       colors: [],
       sizes: [],
-      minPrice:null,
+      minPrice:0,
       maxPrice:100000,
       minDiscount: 0,
       sort : "price_low",
       pageNumber: 0,
-      pageSize:5,
+      pageSize:1,
       stock:""
     }
     dispatch(findProducts(data))
@@ -57,7 +57,7 @@ const productObject = {
             <TableCell align="left">Price</TableCell>
             <TableCell align="left">Quantity</TableCell>
 
-            <TableCell align="left">Delate</TableCell>
+            <TableCell align="left">Delete</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

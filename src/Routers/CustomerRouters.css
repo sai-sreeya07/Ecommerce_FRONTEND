@@ -1,0 +1,10 @@
+/* src/CustomerRouters.css */
+.main-page-content {
+    /* Adjust this value based on the actual height you found in step 1 */
+    padding-top: 100px; /* Example: if your entire nav bar is 100px tall */
+  }
+  
+  /* Optional: If your footer is also fixed/absolute, you might need padding-bottom */
+  /* .main-page-content {
+    padding-bottom: 80px; // Example for footer height
+  } */
