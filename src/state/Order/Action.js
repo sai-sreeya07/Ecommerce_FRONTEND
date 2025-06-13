@@ -71,8 +71,6 @@ export const getOrderHistory = (reqData) => async (dispatch) => {
         Authorization: `Bearer ${reqData.jwt}`,
       },
     };
-
-    // ✅ FIXED: added `config` as second parameter to include headers
     const { data } = await api.get(`/api/orders/user`, config);
 
     console.log("order history -------- ", data);

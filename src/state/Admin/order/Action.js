@@ -1,7 +1,8 @@
-import axios from "axios";
+import axios from "axios"; // Import axios directly
+import { API_BASE_URL } from "../../../config/apiConfig"; // Import API_BASE_URL, not 'api' instance
+// Remove the unused import: import { type } from "@testing-library/user-event/dist/type";
 
 import {
-    
     CONFIRMED_ORDER_FAILURE,
     CONFIRMED_ORDER_REQUEST,
     CONFIRMED_ORDER_SUCCESS,
@@ -17,96 +18,139 @@ import {
     SHIP_ORDER_FAILURE,
     SHIP_ORDER_REQUEST,
     SHIP_ORDER_SUCCESS,
-
+    // Add other action types if you use them here (PLACED_ORDER, CANCELED_ORDER)
 } from "./ActionType";
-import { type } from "@testing-library/user-event/dist/type";
-import { api } from "../../../config/apiConfig";
 
-
-
-
-export const getOrders=() => {
-    console.log("get all order ");
-    return async (dispatch) => {
-        dispatch({type:GET_ORDER_REQUEST});
-        try {
-            
-            const response = await api.get(`/api/admin/orders/`);
-            console.log("get all order ", response.data);
-            dispatch({type:GET_ORDER_SUCCESS,payload:response.data});
-        } catch (error) {
-
-            console.log("catch error ",error);
-            dispatch({type:GET_ORDER_FAILURE,payload:error.message});
+// Helper function to get auth headers with the latest JWT
+const getAuthHeaders = () => {
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+        console.error('Authentication required: JWT token not found in localStorage.');
+        return null; // Return null if no token is found
+    }
+    return {
+        headers: {
+            "Authorization": `Bearer ${jwt}`,
+            "Content-Type": "application/json"
         }
     };
 };
 
-export const confirmOrder = (orderid) => async (dispatch)=>{
-    dispatch({type:CONFIRMED_ORDER_REQUEST});
-
+export const getOrders = () => async (dispatch) => {
+    dispatch({ type: GET_ORDER_REQUEST });
     try {
-        const response =await api.put(`/api/admin/orders/${orderid}/confirmed`);
+        const config = getAuthHeaders();
+        if (!config) { // Check if config was successfully created
+            dispatch({ type: GET_ORDER_FAILURE, payload: 'Authentication required: JWT token not found.' });
+            return; // Stop execution
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/api/admin/orders/`, config);
+        console.log("get all order ", response.data);
+        dispatch({ type: GET_ORDER_SUCCESS, payload: response.data });
+    } catch (error) {
+        console.log("catch error ", error);
+        dispatch({ type: GET_ORDER_FAILURE, payload: error.response?.data?.message || error.message });
+    }
+};
+
+export const confirmOrder = (orderId) => async (dispatch) => { // Changed orderid to orderId for consistency
+    dispatch({ type: CONFIRMED_ORDER_REQUEST });
+    try {
+        const config = getAuthHeaders();
+        if (!config) {
+            dispatch({ type: CONFIRMED_ORDER_FAILURE, payload: 'Authentication required: JWT token not found.' });
+            return;
+        }
+
+        const response = await axios.put(
+            `${API_BASE_URL}/api/admin/orders/${orderId}/confirmed`,
+            {}, // Empty body for PUT requests that don't need one
+            config
+        );
         const data = response.data;
-        console.log("confirm_order ",data)
-        dispatch({type:CONFIRMED_ORDER_SUCCESS,payload:data});
+        console.log("confirm_order ", data);
+        dispatch({ type: CONFIRMED_ORDER_SUCCESS, payload: data });
     } catch (error) {
-        dispatch({type:CONFIRMED_ORDER_FAILURE,payload:error.message});
+        dispatch({ type: CONFIRMED_ORDER_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
 
-export const shipOrder = (orderid)=>{
-    return async (dispatch)=>{
-        try {
-            dispatch({type:SHIP_ORDER_REQUEST});
-            const {data} =await api.put(`/api/admin/orders/${orderid}/ship`);
-            console.log(" shipped order",data)
-            dispatch({type:SHIP_ORDER_SUCCESS,payload:data});
-        } catch (error) {
-            dispatch({type:SHIP_ORDER_FAILURE,payload:error.message});
-        }
-    };
-};
-
-export const deliveredOrder = (orderid)=>async (dispatch)=>{
-    dispatch({type:DELIVERED_ORDER_REQUEST});
-
+export const shipOrder = (orderId) => async (dispatch) => { // Changed orderid to orderId for consistency
+    dispatch({ type: SHIP_ORDER_REQUEST });
     try {
-        const response=await api.put(`/api/admin/orders/${orderid}/deliver`);
-        const data=response.data;
-        console.log("delivered order",data)
-        dispatch({type:DELIVERED_ORDER_SUCCESS,payload:data});
+        const config = getAuthHeaders();
+        if (!config) {
+            dispatch({ type: SHIP_ORDER_FAILURE, payload: 'Authentication required: JWT token not found.' });
+            return;
+        }
+
+        const { data } = await axios.put(
+            `${API_BASE_URL}/api/admin/orders/${orderId}/ship`,
+            {},
+            config
+        );
+        console.log(" shipped order", data);
+        dispatch({ type: SHIP_ORDER_SUCCESS, payload: data });
     } catch (error) {
-        dispatch({type:DELIVERED_ORDER_FAILURE,payload:error.message});
+        dispatch({ type: SHIP_ORDER_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
 
+export const deliveredOrder = (orderId) => async (dispatch) => { // Changed orderid to orderId for consistency
+    dispatch({ type: DELIVERED_ORDER_REQUEST });
+    try {
+        const config = getAuthHeaders();
+        if (!config) {
+            dispatch({ type: DELIVERED_ORDER_FAILURE, payload: 'Authentication required: JWT token not found.' });
+            return;
+        }
+
+        const response = await axios.put(
+            `${API_BASE_URL}/api/admin/orders/${orderId}/deliver`,
+            {},
+            config
+        );
+        const data = response.data;
+        console.log("delivered order", data);
+        dispatch({ type: DELIVERED_ORDER_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({ type: DELIVERED_ORDER_FAILURE, payload: error.response?.data?.message || error.message });
+    }
+};
+
+// Uncommented and fixed deleteOrder action
+export const deleteOrder = (orderId) => async (dispatch) => { // Changed reqData to orderId for consistency
+    dispatch({ type: DELETE_ORDER_REQUEST });
+    try {
+        const config = getAuthHeaders();
+        if (!config) {
+            dispatch({ type: DELETE_ORDER_FAILURE, payload: 'Authentication required: JWT token not found.' });
+            return;
+        }
+
+        await axios.delete(`${API_BASE_URL}/api/admin/orders/${orderId}/delete`, config);
+        console.log("delete order ", orderId); // Log the deleted orderId
+        dispatch({ type: DELETE_ORDER_SUCCESS, payload: orderId }); // Dispatch orderId to update state
+    } catch (error) {
+        console.log("catch error ", error);
+        dispatch({ type: DELETE_ORDER_FAILURE, payload: error.response?.data?.message || error.message });
+    }
+};
+
+// Keep other commented out actions if you plan to implement them later
 // export const cancelOrder = (order_id)=>async (dispatch)=>{
 //     dispatch({type:CANCELED_ORDER_REQUEST});
-
 //     try {
-//         const response=await api.put(`/api/admin/order/${order_id}/cancel`);
+//         const config = getAuthHeaders();
+//         if (!config) {
+//             dispatch({type:CANCELED_ORDER_FAILURE,payload:'Authentication required: JWT token not found.'});
+//             return;
+//         }
+//         const response=await axios.put(`${API_BASE_URL}/api/admin/order/${order_id}/cancel`, {}, config);
 //         const data=response.data;
-//         // console.log("delivered order",data)
 //         dispatch({type:CANCELED_ORDER_SUCCESS,payload:data});
 //     } catch (error) {
 //         dispatch({type:CANCELED_ORDER_FAILURE,payload:error.message});
 //     }
-// };
-
-// export const deleteOrder=(reqData) => {
-//     console.log("get all order ",reqData);
-//     return async (dispatch) => {
-//         dispatch({type:DELETE_ORDER_REQUEST});
-//         try {
-            
-//             const {data}=await api.delete(`/api/admin/order/${orderid}/delete`);
-//             console.log("delete order ",data);
-//             dispatch({type:DELETE_ORDER_SUCCESS,payload:data});
-//         } catch (error) {
-
-//             console.log("catch error ",error);
-//             dispatch({type:DELETE_ORDER_FAILURE,payload:error.message});
-//         }
-//     };
 // };
